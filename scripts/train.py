@@ -371,8 +371,30 @@ def train(args):
     wandb.init(project=project_name, config=args)
 
     # init training dataset
-    print("preparing data...")
-    scanqa_train, scanqa_val, all_scene_list = get_scanqa(SCANQA_TRAIN, SCANQA_VAL, args.train_num_scenes, args.val_num_scenes)
+    print("preparing training data...")
+    use_data_till = 12
+    SCANQA_TRAIN_filtered, SCANQA_VAL_filtered = [], []
+    for data in SCANQA_TRAIN:
+        scene_id = data['scene_id']
+        scene_num = scene_id.split("_")[0].replace("scene0", "")
+        if int(scene_num) > use_data_till:
+            pass
+        else:
+            SCANQA_TRAIN_filtered.append(data)
+            print(scene_num)
+    
+    print("preparing validation data...")
+    for data in SCANQA_VAL:
+        scene_id = data['scene_id']
+        scene_num = scene_id.split("_")[0].replace("scene0", "")
+        if int(scene_num) > use_data_till:
+            pass
+        else:
+            SCANQA_VAL_filtered.append(data)
+            print(scene_num)
+        
+    # scanqa_train, scanqa_val, all_scene_list = get_scanqa(SCANQA_TRAIN, SCANQA_VAL, args.train_num_scenes, args.val_num_scenes)
+    scanqa_train, scanqa_val, all_scene_list = get_scanqa(SCANQA_TRAIN_filtered, SCANQA_VAL_filtered, args.train_num_scenes, args.val_num_scenes)
     scanqa = {
         "train": scanqa_train,
         "val": scanqa_val
