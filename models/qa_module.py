@@ -223,3 +223,55 @@ class ScanQA(nn.Module):
             data_dict["answer_scores"] = self.answer_cls(fuse_feat) # batch_size, num_answers
 
         return data_dict
+
+
+if __name__ == "__main__":
+    print("Testing ScanQA model")
+    # model = ScanQA(10, 10, 256, 12, 10, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 256 * 2, 256, 1, 1, 1, 1024 * 2
+    model = ScanQA(num_answers = 10, 
+        # proposal
+        num_object_class = 10, input_feature_dim = 256,
+        num_heading_bin = 12, num_size_cluster = 10, mean_size_arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 
+        num_proposal=256, vote_factor=1, sampling="vote_fps", seed_feat_dim=256, proposal_size=128,
+        pointnet_width=1,
+        pointnet_depth=2,        
+        vote_radius=0.3, 
+        vote_nsample=16,
+        # qa
+        #answer_cls_loss="ce",
+        answer_pdrop=0.3,
+        mcan_num_layers=2,
+        mcan_num_heads=8,
+        mcan_pdrop=0.1,
+        mcan_flat_mlp_size=512, 
+        mcan_flat_glimpses=1,
+        mcan_flat_out_size=1024,
+        # lang
+        lang_use_bidir=False,
+        lang_num_layers=1,
+        lang_emb_size=300,
+        lang_pdrop=0.1,
+        bert_model_name=None,
+        freeze_bert=False,
+        finetune_bert_last_layer=False,
+        # common
+        hidden_size=128,
+        # option
+        use_object_mask=False,
+        use_lang_cls=False,
+        use_reference=False,
+        use_answer=False,
+    )
+    
+    data_dict = {
+        "lang_feat": torch.randn(16, 20, 300),
+        "lang_mask": torch.randn(16, 20),
+        "object_feat": torch.randn(16, 1024, 256),
+        "object_mask": torch.randn(16, 1024),
+        "objectness_scores": torch.randn(16, 1024, 2),
+        "bbox_mask": torch.randn(16, 1024),
+    }
+    
+    output = model(data_dict)
+    print(output.keys())
+    
