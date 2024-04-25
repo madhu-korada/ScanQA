@@ -371,8 +371,9 @@ def train(args):
     wandb.init(project=project_name, config=args)
 
     # init training dataset
-    print("preparing training data...")
-    use_data_till = 12
+    print("\npreparing training data...")
+    use_data_till = 30
+    scenes_train_list, scenes_val_list = [], [] 
     SCANQA_TRAIN_filtered, SCANQA_VAL_filtered = [], []
     for data in SCANQA_TRAIN:
         scene_id = data['scene_id']
@@ -381,9 +382,12 @@ def train(args):
             pass
         else:
             SCANQA_TRAIN_filtered.append(data)
-            print(scene_num)
+            if scene_num not in scenes_train_list:
+                scenes_train_list.append(scene_num)
+            # print(scene_num)
+    print("Training uses the scenes ", scenes_train_list)
     
-    print("preparing validation data...")
+    print("\npreparing validation data...")
     for data in SCANQA_VAL:
         scene_id = data['scene_id']
         scene_num = scene_id.split("_")[0].replace("scene0", "")
@@ -391,7 +395,11 @@ def train(args):
             pass
         else:
             SCANQA_VAL_filtered.append(data)
-            print(scene_num)
+            if scene_num not in scenes_val_list:
+                scenes_val_list.append(scene_num)
+            # print(scene_num)
+    print("Valiation uses the scenes ", scenes_val_list)
+    
         
     # scanqa_train, scanqa_val, all_scene_list = get_scanqa(SCANQA_TRAIN, SCANQA_VAL, args.train_num_scenes, args.val_num_scenes)
     scanqa_train, scanqa_val, all_scene_list = get_scanqa(SCANQA_TRAIN_filtered, SCANQA_VAL_filtered, args.train_num_scenes, args.val_num_scenes)
